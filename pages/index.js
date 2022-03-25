@@ -63,47 +63,15 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Example() {
+
+
+export default function Example( {institutions}) {
+  console.log(institutions)
+
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const data = useMemo(
-    () => [
-      {
-        rank: 1,
-        institution: 'Carnegie Mellon University',
-        count: 20.2,
-        numFaculty: 162
-      },
-      {
-        rank: 2,
-        institution: 'Univ. of Illinois at Urbana-Champaign',
-        count: 14.3,
-        numFaculty: 110
-      },
-      {
-        rank: 3,
-        institution: 'Massachusetts Institute of Technology',
-        count: 13.4,
-        numFaculty: 92
-      },
-      {
-        rank: 4,
-        institution: 'Univ. of California - San Diego',
-        count: 11.9,
-        numFaculty: 108
-      },
-      {
-        rank: 5,
-        institution: 'Stanford University',
-        count: 11.8,
-        numFaculty: 69
-      },
-      {
-        rank: 6,
-        institution: 'University of Michigan',
-        count: 11.0,
-        numFaculty: 96
-      },
-    ],
+    () =>
+      institutions,
     []
   )
 
@@ -116,7 +84,7 @@ export default function Example() {
       },
       {
         Header: 'Institution',
-        accessor: 'institution',
+        accessor: 'name',
       },
       {
         Header: 'Count',
@@ -361,4 +329,35 @@ export default function Example() {
       </div>
     </div>
   )
+}
+
+// API Calls 
+
+// GET LIST OF INSTITUTIONS
+// async function getInstitutions() {
+//   let response = await fetch("http://localhost:8000/api/v0/institutions");
+//   let data = await response.json();
+//   return data;
+// }
+
+// This function gets called at build time
+export async function getStaticProps() {
+  // Call an external API endpoint to get posts
+  const res = await fetch("http://localhost:8000/api/v0/institutions");
+  const institutions = await res.json()
+  let rank = 1;
+  institutions.map(function(ele){
+        ele.rank=rank;
+        ele.count=0;
+        ele.numFaculty = 0;
+        rank++;
+        return ele;
+      });
+  // By returning { props: { posts } }, the Blog component
+  // will receive `posts` as a prop at build time
+  return {
+    props: {
+      institutions,
+    },
+  }
 }
