@@ -65,8 +65,7 @@ function classNames(...classes) {
 
 
 
-export default function Example( {institutions}) {
-  console.log(institutions)
+export default function Example( {institutions, people}) {
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const data = useMemo(
@@ -303,7 +302,7 @@ export default function Example( {institutions}) {
                               return (
                                 <tr {...row.getRowProps()}>
                                   {row.cells.map(cell => {
-                                    console.log(cell);
+                                    // console.log(cell);
                                     return (
                                       <td
                                         {...cell.getCellProps()}
@@ -332,32 +331,29 @@ export default function Example( {institutions}) {
 }
 
 // API Calls 
-
-// GET LIST OF INSTITUTIONS
-// async function getInstitutions() {
-//   let response = await fetch("http://localhost:8000/api/v0/institutions");
-//   let data = await response.json();
-//   return data;
-// }
-
 // This function gets called at build time
 export async function getStaticProps() {
-  // Call an external API endpoint to get posts
+  // GET LIST OF INSTITUTIONS
   const res = await fetch("http://localhost:8000/api/v0/institutions");
   const institutions = await res.json()
+
+  // const people_res = await fetch("http://localhost:8000/api/v0/people");
+  // const people = await people_res.json()
+
   let rank = 1;
   institutions.map(function(ele){
-        ele.rank=rank;
-        ele.count=0;
-        ele.numFaculty = 0;
-        rank++;
-        return ele;
-      });
-  // By returning { props: { posts } }, the Blog component
-  // will receive `posts` as a prop at build time
+      ele.rank=rank;
+      ele.count=0;
+      ele.numFaculty = ele.FACULTY.length;
+      rank++;
+      return ele;
+    });
+
   return {
     props: {
       institutions,
+      // people
     },
+    revalidate: 30, // fetch data at most every 30s when a request comes in.
   }
 }
